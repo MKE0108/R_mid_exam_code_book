@@ -1,0 +1,145 @@
+```{R}
+y=data.frame(WD=c(2,3), ID=c("tinin","bp"), Date=as.Date(c("2016-02-23","2016-02-24")))
+y
+y$ID[2]
+y[,c(2,3)]
+```
+    
+```{R}
+y=data.frame(WD=c(2,3), ID=c("tinin","bp"), Date=as.Date(c("2016-02-23","2016-02-24")))
+z=data.frame(PHONE=c("0910","0911"))
+cbind(y,z)
+```
+exercise
+```{R}
+x=read.csv("Week 2/Taiwan.csv")
+print(sum(x$Resident))
+#Calculate the population density of each county
+print(x$Resident / x$Area)
+#Sort the data in descending order by population density 
+#combine with the original data
+# Calculate the population density of each county and combine with the original data
+x = cbind(x, Density = x$Resident / x$Area)
+print(x[order(x$Density, decreasing = TRUE),])
+print(length(which(x$Resident > 2000000)))
+print(x$County[which(x$Resident > 2000000)])
+print(which(x$Resident > 2000000))
+```
+merge
+```{R}
+a=data.frame(WD=c(2,3,4), ID=c("tinin", "bp","lee"), 
+Date=as.Date(c("2016-02-23","2016-02-24","2016-02-25")),
+PHONE=c("0910","0955","0933")) 
+b=data.frame(PHONE=c("0910","0955","0987","0966"),
+NAME=c("CHT","FET","TM","PHS"))
+#outer join
+merge(x=a, y=b, by="PHONE",all=TRUE)
+#left join
+merge(x=a, y=b, by="PHONE",all.x=TRUE)
+#right join
+merge(x=a, y=b, by="PHONE",all.y=TRUE)
+#inner join
+merge(x=a, y=b, by="PHONE")
+```
+```{R}
+a=read.csv("bg/Week 2/AQX.csv")
+b=read.csv("bg/Week 2/AQXsite.csv")
+
+outer=merge(x=a,y=b,by="SiteName",all=TRUE)
+left=merge(x=a,y=b,by="SiteName",all.x=TRUE)
+right=merge(x=a,y=b,by="SiteName",all.y=TRUE)
+inner=merge(x=a,y=b,by="SiteName",all=FALSE)
+#save outer left right inner as csv
+write.csv(outer,"bg/Week 2/AQSouter.csv")
+write.csv(left,"bg/Week 2/AQSleft.csv")
+write.csv(right,"bg/Week 2/AQSright.csv")
+write.csv(inner,"bg/Week 2/AQSinner.csv")
+print(outer)
+print(left)
+print(right)
+print(inner)
+```
+```{R}
+```
+```{R}
+```
+```{R}
+
+```
+```{R}
+x=rnorm(222)
+hist(x)
+```
+
+```{R}
+n=10
+array=rep(c(0),times=n*n)
+
+dim(array)=c(n,n)
+display=array
+array[,1]=1
+
+for (i in 2:n){
+    for (j in 2:i){
+        array[i,j]=array[i-1,j-1]+array[i-1,j]
+    }
+}
+
+```
+```{R}
+x = unique(iris[,5])
+y = 0#y[1]=0
+for (i in x)
+{
+  y[i] = mean(iris[iris[,5]==i,1])
+}
+```
+```{R}
+x = unique(iris[,5])
+y = 0#y[1]=0
+for (i in 1:length(x))
+{
+  y[i] = mean(iris[iris[,5]==x[i],1])
+}
+names(y)=x
+y
+```
+EX
+```{R}
+x=unique(iris[,5])
+y=colnames(iris[,1:4])
+z=array(0,c(length(x),length(y)))
+rownames(z)=x
+colnames(z)=y
+for (sep in x){
+  for (lw in y){
+    z[sep,lw]=mean(iris[which(iris[,5]==sep),lw])
+  } 
+}
+print(z)
+```
+exercise
+
+```{R}
+x=read.csv("Week 2/AirPollution.csv",header=T)
+x
+station=unique(x$station)#row
+type=unique(x$type)#col
+df=matrix(0,nrow=length(station),ncol=length(type))
+
+rownames(df)=station
+colnames(df)=type
+for (i in 1:length(station)){
+  for (j in 1:length(type)){
+    data=x[x$station==station[i]&x$type==type[j],4:ncol(x)]
+    df[i,j]=mean(as.numeric(data))
+  }
+}
+df
+```
+
+```{R}
+multi<-function(x){
+  return(x*x, x+x)
+}
+```

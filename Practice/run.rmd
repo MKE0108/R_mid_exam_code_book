@@ -1,0 +1,20 @@
+```{R}
+x=read.csv("Practice/input1.csv",na.strings = "")
+totol_event=0
+output=data.frame(USER_ID=character(0),Time=character(0),Event=character(0))
+for(i in 1:nrow(x)){
+    user_id=x[i,"USERID"]
+    n_element=length(which(!is.na(x[i,]))==T)-1
+    if(n_element==0) next
+    x[i,which(x[i,]=='s')]=1
+    x[i,which(x[i,]=='e')]=n_element
+    for(j in 1:n_element){
+        e<-colnames(x[i,])[which(x[i,]==j)]
+        t<-as.character(j)
+        output=rbind(output,data.frame(USER_ID=user_id,Time=t,Event=e))
+    }
+}
+write.csv(output,"Practice/output.csv",quote=F,row.names=F)
+
+
+```

@@ -1,0 +1,66 @@
+```{R}
+plot(iris[,3:4],main="Iris Data",xlab="Petal Length",
+    ylab="Petal Width",col=iris$Species,
+    xlim=c(0,7),ylim=c(0,7),
+    pch=21,cex=1,type='p')
+    # cex : 倍率
+    # pch : 形状
+    # type : 点的类型
+    # col : 颜色
+```
+```{R}
+x=iris[,3]
+y=iris[,4]
+plot(x,y)
+abline(h=1.5,col=2)
+```
+```{R}
+x=iris[,3]
+y=iris[,4]
+out=lm(y~x) #lm :linear model use x to predict y
+abline(out,col=3)
+```
+```{R}
+x=cars[,1]
+y=cars[,2]
+f=lm(y~x)
+summary(f)
+correlation <- cor(x, y)
+correlation_string <- paste("Correlation: ", correlation)
+print(correlation_string)
+plot(x, y, main="Car Data", xlab="Speed", ylab="Distance")
+abline(f,col=2)
+
+```
+```{R}
+matplot(iris[,1:4],type="b",pch=1:4)
+legend("topleft",legend=colnames(iris)[1:4],col=1:4,pch=1:4)
+png("iris.png",width = 10,height = 10,units = "in",res = 300)
+dev.off()
+```
+```{R}
+data = iris
+for (idx1 in 1:(length(colnames(data))-1)){
+    for (idx2 in idx1:(length(colnames(data))-1)){
+        if(idx1==idx2){
+            next
+        }
+        x=data[,idx1]
+        y=data[,idx2]
+        title=paste("Iris Data",colnames(data)[idx1],"vs",colnames(data)[idx2])
+        plot(x,y,main=title,xlab=colnames(data)[idx1],
+            ylab=colnames(data)[idx2],col=data$Species,
+            xlim = c(min(x,y),max(x,y)), ylim = c(min(x,y),max(x,y)),
+            pch=21,cex=1,type='p')
+        abline(0,1,col=2)
+        fit=lm(y~x)
+        abline(fit,col=3)
+        legend("topleft",c("Diagonal line","Fitted line",
+            paste("R-square =",round(summary(fit)$r.squared,4)),
+            paste("y = ",round(fit$coefficients[2],2),
+            " x + (",round(fit$coefficients[1],2),")",sep="")),
+            lty=c(1,1,0,0),col=c(2,3,"white","white"),
+            bg="white")
+    }
+}
+```

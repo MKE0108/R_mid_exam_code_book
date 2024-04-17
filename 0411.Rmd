@@ -1,0 +1,72 @@
+ex1
+```{R}
+library(dplyr)
+data = read.csv("Week 6/name_english.csv",sep=",", header=F)
+colnames(data) = c("sex", "year", "name", "freq")
+#filter date ==2012 sex = "M" -> group by name -> sum freq -> sort by freq -> top 10
+data = data %>% filter(year == 2012) %>% filter(sex == "M") %>% group_by(name)%>% summarise(freq = sum(freq))
+#plot
+library(plotly)
+plot_ly(data, x = ~name, y = ~freq, type = 'bar', name = 'name freq') %>%
+  layout(title = 'Name freq in 2012', xaxis = list(title = 'Name'), yaxis = list(title = 'Freq'))
+```
+ex2
+```{R}
+x = sample(1:6, 150, replace=T, prob=c(0.1, 0.1, 0.2, 0.2, 0.2, 0.2))
+pie(table(x), main="Pie Chart", labels=paste(names(table(x)), ":", round((table(x)/sum(table(x))*100), 2), "%"))
+barplot(table(x), main="Bar Chart", xlab="dices", ylab="Frequency")
+```
+ex3
+```{R}
+x=read.csv("Week 6/Taiwan.csv",sep=",")
+barplot(x$Resident, names.arg=x$County, main="Population by County", xlab="County", ylab="Population")
+barplot(x$Area, names.arg=x$County, main="Aera by County", xlab="Aera", ylab="Population")
+
+```
+ex4
+```{R}
+library(dplyr)
+library(plotly)
+data = read.csv("Week 6/Taiwan.csv",sep=",", header=T)
+plot_ly(data=data, x = ~County, y = ~Resident, type = 'bar', name = 'Resident') %>%
+  layout(title = 'Population  by County', xaxis = list(title = 'County'), yaxis = list(title = 'Resident'))
+plot_ly(data=data, x = ~County, y = ~Area, type = 'bar', name = 'Area') %>%
+  layout(title = 'Area by County', xaxis = list(title = 'County'), yaxis = list(title = 'Area'))
+#plotly pie
+plot_ly(data, labels = ~County, values = ~Resident, type = 'pie') %>%
+  layout(title = 'Population by County')
+plot_ly(data, labels = ~County, values = ~Area, type = 'pie') %>%
+  layout(title = 'Area by County')
+
+```
+ex5
+```{R}
+x=read.csv("Week 8/Taipei_LAND_A.csv",sep=",",header=T)
+boxplot(x$Price~x$Location)
+
+plot_ly(data=x, x = ~Location, y = ~Price, type = 'box',color = ~Location) %>%
+  layout(title = 'Price by Location', xaxis = list(title = 'Location'), yaxis = list(title = 'Price'))
+
+dist=unique(x$Location)
+d=x[which(x$Location==dist[1]),]
+p=plot_ly(data=d, x = ~Location, y = ~Price, type = 'box', name = dist[1])
+for (i in 2:length(dist)){
+  d=x[which(x$Location==dist[i]),]
+  p= add_trace(p, data=d, x = ~Location, y = ~Price, type = 'box', name = dist[i])
+}
+p
+```
+ex6
+```{R}
+library(leaflet)
+x=read.csv("Week 8/MRT.csv",sep=",",header=T)
+UserIcon = icons(
+  iconUrl = "Week 8/MRT.png",
+  iconWidth = 30, iconHeight = 30)
+View(x)
+m = leaflet(data=x) %>%addTiles() %>%
+addMarkers(~lon, ~lat, icon = UserIcon,popup=paste(x$id))
+
+m 
+
+```

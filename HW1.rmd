@@ -1,0 +1,64 @@
+```{R}
+data <- read.csv("input1.csv", na.strings = c("#",""))
+n_of_user <- nrow(data)
+output_row_cnt <- 0
+for (i in 1:n_of_user) {
+    n_of_event <- sum(!is.na(data[i, 2:ncol(data)]))
+    output_row_cnt <- output_row_cnt + n_of_event
+    data[i, which(data[i, ] == "s")] <- 1
+    data[i, which(data[i, ] == "e")] <- n_of_event
+}
+output <- data.frame(USERID = character(output_row_cnt), 
+                     Time = numeric(output_row_cnt), 
+                     Event = character(output_row_cnt))
+names(output) <- c("USERID","Time","Event")
+start_base <- 1
+for (i in 1:n_of_user){
+    n_of_event <- sum(!is.na(data[i,2:ncol(data)]))
+    if (n_of_event == 0) next
+    for(j in 1:n_of_event){
+        output[start_base+j-1, "USERID"] <- data[i, "USERID"]
+        output[start_base+j-1, "Time"] <- j
+        output[start_base+j-1, "Event"] <- colnames(data)[which(data[i, ] == j)]
+    }
+    start_base <- start_base + n_of_event
+}
+write.csv(output, file = "output.csv", row.names = FALSE, quote = FALSE)
+print(output)
+```
+```{R}
+x = read.csv("dat.csv", sep=',', header = T)
+users = unique(x$USERID)
+features = colnames(x)[2:ncol(x)]
+
+eli_empty_string<-function(column){
+  column = as.character(column)
+  column[column==""] = NA
+  return (column)
+}
+x = as.data.frame(lapply(x[,1:length(colnames(x))], eli_empty_string))
+transpose_x = t(x)
+#out empty data frame
+out = data.frame(USER_ID=character(), Time=integer(), EVENT=character())
+print(out)
+for (i in 1:length(users)){
+  t = 1
+  sort_result = sort(transpose_x[,i])
+  s = sort_result[length(sort_result) - 1]
+  e = sort_result[length(sort_result) - 2]
+  u0 = sort_result[length(sort_result)]
+  s_data = data.frame(USER_ID=u0,Time=t, EVENT=names(s), row.names = NULL)
+  out = rbind(out, s_data)
+  if(length(sort_result) > 3){   #pretend 1:0
+    for(j in 1:(length(sort_result)-3)){  #error
+      t = t+1
+      data = data.frame(USER_ID=u0,Time=t, EVENT=names(sort_result[j]), row.names = NULL)
+      out = rbind(out, data)
+    }
+  }
+  t = t + 1
+  e_data = data.frame(USER_ID=u0,Time=t, EVENT=names(e), row.names = NULL)
+  out = rbind(out, e_data)
+}
+out 
+```

@@ -1,0 +1,155 @@
+```{R}
+multi<-function(x){
+   result=1
+   for (i in 1:length(x)){
+      result=result*x[i]
+   }
+   return(result)
+}
+apply(iris[,1:4],2,multi)
+```
+READ
+```{R}
+url = URLencode("https://data.epa.gov.tw/api/v1/aqx_p_304?limit=1000&api_key=9be7b239-557b-4c10-9775-78cadfc555e9&format=csv")
+x=readLines(url,encoding = "UTF-8")
+```
+```{R}
+# Read the XML file
+library(XML)
+xmlfile <- xmlParse("Week 2/AQX.xml")
+rootnode <- xmlRoot(xmlfile)
+
+# Convert XML to dataframe
+df <- xmlToDataFrame(rootnode)
+
+```
+```{R}
+library(jsonlite)
+x= fromJSON("Week 2/AQX.json")
+```
+```{R}
+a=data.frame(WD=c(2,3,4),ID=c("A","B","C"))
+Data=as.Date(c("2011-01-01","2011-01-02","2011-01-03"))
+Phone=c("0912345678","0923456789","0934567890")
+write.table(a,"a.csv",row.names=F,col.names=T,sep=",",quote = F)
+```
+```{R}
+library(jsonlite)
+x=fromJSON("Week 2/AQX.json")
+sink("a.txt")#將輸出結果寫入檔案
+x
+sink()
+```
+```{R}
+#json to csv
+library(jsonlite)
+x=fromJSON("Week 2/AQX.json")
+write.csv(x,"a.csv",row.names=F)
+```
+filiter -> choose specific col- element -> show all matched col- data
+select -> choose specific row| element  -> show all matched row| data
+dplyr
+```{R}
+library(dplyr)
+titanic=data.frame(Titanic)
+titanic[titanic$Sex == "Male" & titanic$Age =="Adult",]
+filter(titanic,Sex=="Male" & Age=="Adult")
+filter(titanic,Class %in% c("1st","Crew"))
+select(titanic,Sex,Age)
+filter(titanic,Class %in% c("1st","Crew"))
+select(titanic,Sex:Survived)
+
+
+titanic %>% select(Sex,Class,Freq,Age)%>% filter(Age=="Child")%>%
+   arrange(Freq)
+titanic %>% select(Sex,Class,Freq,Age)%>% filter(Age=="Child")%>%
+   arrange(desc(Freq))
+#add column
+freqsum = titanic %>% select(Freq)%>%sum()
+titanic %>% mutate(Percentage=Freq/freqsum)
+#group by
+titanic %>% group_by(Sex)%>%
+   summarise(Sexsum=sum(Freq,na.rm = T))
+#count
+titanic %>% select(Sex)%>%
+   summarise_each(funs(n()))
+nrow(titanic)
+titanic %>% select(Sex)%>%
+   summarise_each(funs(n_distinct(Sex)))
+length(unique(titanic$Sex))
+titanic %>% 
+   group_by(Age, Sex)%>%
+   summarise(fs = sum(Freq))%>%
+   arrange(desc(fs))
+
+
+```
+```{R}
+data = titanic %>% 
+   group_by(Age, Sex)%>%
+   summarise(fs = sum(Freq))%>%
+   arrange(desc(fs))                                                                              
+barplot(data$fs,names.arg = paste(data$Age,data$Sex),)
+```
+Ex
+```{R}
+library(dplyr)
+data=read.csv("Week 2/311.csv")
+
+table(data$Complaint.Type)
+
+summarized_data=data %>% 
+   count(Complaint.Type)
+barplot(summarized_data$n,names.arg = paste(summarized_data$Complaint.Type),)
+```
+```{R}
+library(dplyr)
+data=read.csv("Week 2/311.csv")
+summarized_data=data %>% filter(Complaint.Type=="Blocked Driveway")%>%
+   count(Borough)
+selectedData = data %>% filter(Complaint.Type=="Blocked Driveway")
+table(selectedData$Borough)
+barplot(summarized_data$n,names.arg = paste(summarized_data$Borough),)
+```
+```
+```{R}
+library(dplyr)
+data = read.csv("Week 2/name_english.csv",sep=",",header = F)
+colnames(data) =c("sex","year","name","freq")
+top10_female = data %>% 
+   filter(year == "2012" & sex == "F") %>% 
+   group_by(name) %>%
+   summarise(count = sum(freq)) %>%
+   arrange(desc(count)) %>%
+   head(10)
+top10_male = data %>% 
+   filter(year == "2012" & sex == "M") %>%
+   group_by(name) %>%
+   summarise(count = sum(freq)) %>%
+   arrange(desc(count)) %>%
+   head(10)
+pie(top10_male$count,labels = top10_male$name)
+pie(top10_female$count,labels = top10_female$name)
+
+```
+```{R}
+# Create a dataframe for female names
+dF = data %>% 
+   group_by(sex, year, name) %>%
+   summarise(count = sum(freq)) %>% 
+   group_by(sex, year) %>% 
+   mutate(prop = round(count * 100/sum(count), 3)) %>% 
+   filter(name %in% top10_female$name) 
+
+# Create a dataframe for male names
+dM = data %>% 
+   group_by(sex, year, name) %>%
+   summarise(count = sum(freq)) %>% 
+   group_by(sex, year) %>%
+   mutate(prop = round(count * 100/sum(count), 3)) %>% 
+   filter(name %in% top10_male$name)
+library(ggplot2)
+ggplot(data = dF, aes(x=year, y=count, group=name)) + geom_path(aes(colour=name)) + geom_point(aes(colour=name))
+ggplot(data = dM, aes(x=year, y=count, group=name)) + geom_path(aes(colour=name)) + geom_point(aes(colour=name))
+
+```
